@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personal Cookbook</title>
+    <style>
+      /* Base Styles */
+      body {
+        font-family: "Courier New", monospace;
+        background: #f8e8c3;
+        text-align: center;
+        padding: 20px;
+        transition: background-color 0.8s ease-in-out;
+      }
+
+      .cookbook {
+        background: #fffaf0;
+        padding: 20px;
+        max-width: 500px;
+        margin: auto;
+        border: 5px solid #b97a57;
+        box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.2);
+        position: relative;
+        transition: transform 0.5s ease, box-shadow 0.5s ease;
+      }
+
+      .cookbook:hover {
+        transform: translateY(-5px);
+        box-shadow: 10px 15px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      h1 {
+        font-family: "alex brush", cursive;
+        animation: fadeIn 1.5s ease;
+        position: relative;
+      }
+
+      h2 {
+        position: relative;
+        display: inline-block;
+        margin: 15px 0;
+      }
+
+      h2::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 2px;
+        background-color: #b97a57;
+        transition: width 0.3s ease;
+      }
+
+      h2:hover::after {
+        width: 80%;
+      }
+
+      /* Title animation */
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Cookbook shake animation */
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          transform: translateX(-5px);
+        }
+        20%,
+        40%,
+        60%,
+        80% {
+          transform: translateX(5px);
+        }
+      }
+
+      .shake {
+        animation: shake 0.8s ease;
+      }
+
+      form {
+        background: #fdf3e3;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+      }
+
+      input,
+      select {
+        display: block;
+        width: 90%;
+        margin: 8px auto;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: #b97a57;
+        box-shadow: 0 0 5px rgba(185, 122, 87, 0.5);
+        transform: scale(1.02);
+      }
+
+      .buttons-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      button {
+        margin-top: 10px;
+        padding: 10px 15px;
+        cursor: pointer;
+        background-color: #b97a57;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      button:hover {
+        background-color: #a0674a;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Button ripple effect */
+      button::after {
+        content: "";
+        position: absolute;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+        transition: transform 0.5s, opacity 0.5s;
+      }
+
+      button:active::after {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+        transition: 0s;
+      }
+
+      #colorButton {
+        background-color: #7d5a50;
+      }
+
+      #suggestMealBtn {
+        background-color: #558b2f;
+      }
+
+      #errorMessage {
+        color: #e74c3c;
+        font-size: 14px;
+        height: 20px;
+        transition: all 0.3s ease;
+      }
+
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      li {
+        background: #ffe4c4;
+        padding: 15px;
+        margin: 15px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: "Courier New", monospace;
+        border-left: 5px solid #b97a57;
+        position: relative;
+        transition: all 0.3s ease;
+        opacity: 0;
+        transform: translateX(-20px);
+        animation: slideIn 0.5s forwards;
+      }
+
+      @keyframes slideIn {
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      li:hover {
+        transform: translateX(5px);
+        background-color: #ffdab9;
+      }
+
+      /* Recipe category indicators */
+      li::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        position: absolute;
+        left: -15px;
+        top: 50%;
+        transform: translateY(-50%);
+        transition: transform 0.3s ease;
+      }
+
+      li[data-category="breakfast"]::before {
+        background-color: #f9a825;
+      }
+      li[data-category="lunch"]::before {
+        background-color: #43a047;
+      }
+      li[data-category="dinner"]::before {
+        background-color: #5c6bc0;
+      }
+      li[data-category="dessert"]::before {
+        background-color: #ec407a;
+      }
+
+      li:hover::before {
+        transform: translateY(-50%) scale(1.5);
+      }
+
+      /* Delete button styles */
+      li button {
+        background-color: #e57373;
+        padding: 5px 10px;
+        font-size: 12px;
+        margin: 0 0 0 10px;
+      }
+
+      li button:hover {
+        background-color: #c62828;
+      }
+
+      /* Torn Sticky Note Effect */
+      li::after {
+        content: "";
+        width: 80px;
+        height: 30px;
+        background: rgba(255, 229, 200, 0.8);
+        position: absolute;
+        top: -10px;
+        left: -15px;
+        transform: rotate(-5deg);
+        z-index: -1;
+        transition: transform 0.3s ease;
+      }
+
+      li:hover::after {
+        transform: rotate(-8deg) translateY(2px);
+      }
+
+      /* Stains Effect */
+      .cookbook::after {
+        content: "";
+        width: 50px;
+        height: 50px;
+        background: rgba(139, 69, 19, 0.3);
+        border-radius: 50%;
+        position: absolute;
+        bottom: 30px;
+        right: 20px;
+        transform: rotate(-10deg);
+        transition: all 1s ease;
+      }
+
+      .cookbook:hover::after {
+        transform: rotate(10deg) scale(1.2);
+        opacity: 0.5;
+      }
+
+      /* Theme switcher */
+      .theme-indicator {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #f8e8c3;
+        border: 2px solid #b97a57;
+        transition: background-color 0.8s ease;
+      }
+
+      /* Empty state */
+      .empty-state {
+        padding: 20px;
+        color: #7f8c8d;
+        font-style: italic;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 0.6;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.6;
+        }
+      }
+
+      /* Bookmark */
+      .bookmark {
+        position: absolute;
+        top: -10px;
+        right: 30px;
+        width: 20px;
+        height: 40px;
+        background-color: #e74c3c;
+        border-radius: 3px 3px 0 0;
+        transition: height 0.3s ease;
+      }
+
+      .bookmark:hover {
+        height: 45px;
+      }
+
+      /* Meal Suggestion Styles */
+      .meal-suggestion-container {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 2px dashed #b97a57;
+      }
+
+      .meal-suggestions {
+        margin-top: 20px;
+      }
+
+      .meal-plan-card {
+        background: #fdf3e3;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+      }
+
+      .meal-plan-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .meal-plan-card h3 {
+        color: #b97a57;
+        margin-bottom: 10px;
+      }
+
+      .meal-plan-card p {
+        margin-bottom: 15px;
+        color: #666;
+      }
+
+      #generateMealPlanBtn {
+        background-color: #558b2f;
+      }
+
+      .meal-day {
+        background: #fff8e1;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 8px;
+        border-left: 5px solid #ffca28;
+        text-align: left;
+        transform: scale(0.95);
+        opacity: 0;
+        animation: fadeIn 0.5s forwards;
+        transition: all 0.3s ease;
+      }
+
+      .meal-day:hover {
+        transform: scale(1);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .meal-day h4 {
+        color: #795548;
+        margin-bottom: 10px;
+      }
+
+      .meal-category {
+        margin: 5px 0;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .meal-category-name {
+        font-weight: bold;
+        color: #5d4037;
+      }
+
+      .meal-item {
+        color: #6d4c41;
+        font-style: italic;
+      }
+
+      @keyframes slideInFromRight {
+        from {
+          transform: translateX(50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      /* Loading animation */
+      .loading-spinner {
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(185, 122, 87, 0.3);
+        border-radius: 50%;
+        border-top-color: #b97a57;
+        animation: spin 1s ease-in-out infinite;
+        margin: 20px auto;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cookbook">
+      <div class="bookmark"></div>
+      <div class="theme-indicator" id="themeIndicator"></div>
+      <h1>Margaret's Cookbook</h1>
+
+      <form id="recipeForm">
+        <label for="recipeName">Recipe Name:</label>
+        <input type="text" id="recipeName" required />
+
+        <label for="recipeCategory">Category:</label>
+        <select id="recipeCategory">
+          <option value="breakfast">Breakfast</option>
+          <option value="lunch">Lunch</option>
+          <option value="dinner">Dinner</option>
+          <option value="dessert">Dessert</option>
+        </select>
+
+        <button type="submit" id="addRecipeBtn">Add Recipe</button>
+        <p id="errorMessage"></p>
+      </form>
+
+      <h2>Recipe List</h2>
+      <div class="buttons-container">
+        <button id="colorButton">Random Color Theme</button>
+        <button id="suggestMealBtn">Suggest Meals</button>
+      </div>
+      <ul id="recipeList"></ul>
+      <div id="emptyState" class="empty-state">
+        No recipes yet. Add your first recipe above!
+      </div>
+
+      <!-- Meal Suggestion Section -->
+      <div id="mealSuggestionContainer" class="meal-suggestion-container">
+        <h2>Meal Suggestions</h2>
+        <div id="mealSuggestions" class="meal-suggestions">
+          <div class="meal-plan-card">
+            <h3>Your Weekly Meal Plan</h3>
+            <p>Let me suggest some meals for you!</p>
+            <button id="generateMealPlanBtn">Generate Meal Plan</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // DOM Elements
+      const recipeForm = document.getElementById("recipeForm");
+      const recipeNameInput = document.getElementById("recipeName");
+      const recipeCategorySelect = document.getElementById("recipeCategory");
+      const errorMessage = document.getElementById("errorMessage");
+      const recipeList = document.getElementById("recipeList");
+      const colorButton = document.getElementById("colorButton");
+      const cookbook = document.querySelector(".cookbook");
+      const themeIndicator = document.getElementById("themeIndicator");
+      const emptyState = document.getElementById("emptyState");
+      const addRecipeBtn = document.getElementById("addRecipeBtn");
+
+      // User Preferences Object
+      const userPreferences = {
+        theme: localStorage.getItem("cookbookTheme") || "#f8e8c3",
+        recipes: JSON.parse(localStorage.getItem("cookbookRecipes")) || [],
+      };
+
+      // Initialize the app
+      function initApp() {
+        // Apply saved theme
+        applyTheme(userPreferences.theme);
+
+        // Load saved recipes
+        loadRecipes();
+
+        // Add event listeners
+        recipeForm.addEventListener("submit", handleFormSubmit);
+        colorButton.addEventListener("click", changeTheme);
+
+        // Add ripple effect to buttons
+        document.querySelectorAll("button").forEach((button) => {
+          button.addEventListener("click", createRippleEffect);
+        });
+
+        // Update empty state visibility
+        updateEmptyState();
+      }
+
+      // Handle form submission
+      function handleFormSubmit(event) {
+        event.preventDefault();
+
+        const recipeName = recipeNameInput.value.trim();
+        const recipeCategory = recipeCategorySelect.value;
+
+        if (recipeName === "") {
+          showError("Please enter a valid recipe name.");
+          shakeElement(cookbook);
+          return;
+        }
+
+        clearError();
+
+        // Create and add new recipe
+        addRecipe(recipeName, recipeCategory);
+
+        // Reset the form
+        recipeForm.reset();
+
+        // Focus back on input for next entry
+        recipeNameInput.focus();
+      }
+
+      // Add new recipe
+      function addRecipe(name, category) {
+        // Create new recipe object
+        const newRecipe = {
+          id: Date.now(),
+          name: name,
+          category: category,
+        };
+
+        // Add to preferences and save
+        userPreferences.recipes.push(newRecipe);
+        savePreferences();
+
+        // Create and add list item with animation
+        const listItem = createRecipeElement(newRecipe);
+        recipeList.appendChild(listItem);
+
+        // Update empty state
+        updateEmptyState();
+      }
+
+      // Create recipe list item
+      function createRecipeElement(recipe) {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${recipe.name} - (${recipe.category})`;
+        listItem.dataset.category = recipe.category;
+        listItem.dataset.id = recipe.id;
+
+        // Add delete button
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Remove";
+        deleteButton.addEventListener("click", function (event) {
+          event.stopPropagation();
+          removeRecipe(recipe.id, listItem);
+          createRippleEffect(event);
+        });
+
+        listItem.appendChild(deleteButton);
+
+        // Add click animation effect to list item
+        listItem.addEventListener("click", function () {
+          this.style.animation = "none";
+          void this.offsetWidth; // Trigger reflow to restart animation
+          this.style.animation = "slideIn 0.3s forwards";
+        });
+
+        return listItem;
+      }
+
+      // Remove recipe
+      function removeRecipe(id, element) {
+        // Add removal animation
+        element.style.opacity = "0";
+        element.style.transform = "translateX(20px)";
+
+        // Remove after animation completes
+        setTimeout(() => {
+          recipeList.removeChild(element);
+
+          // Remove from preferences and save
+          userPreferences.recipes = userPreferences.recipes.filter(
+            (recipe) => recipe.id !== id
+          );
+          savePreferences();
+
+          // Update empty state
+          updateEmptyState();
+        }, 300);
+      }
+
+      // Load recipes from localStorage
+      function loadRecipes() {
+        recipeList.innerHTML = "";
+        userPreferences.recipes.forEach((recipe) => {
+          const listItem = createRecipeElement(recipe);
+          recipeList.appendChild(listItem);
+        });
+      }
+
+      // Change theme color
+      function changeTheme() {
+        const newColor = getRandomColor();
+        userPreferences.theme = newColor;
+        savePreferences();
+        applyTheme(newColor);
+
+        // Animate the color button
+        this.classList.add("shake");
+        setTimeout(() => this.classList.remove("shake"), 800);
+      }
+
+      // Apply theme color
+      function applyTheme(color) {
+        document.body.style.backgroundColor = color;
+        themeIndicator.style.backgroundColor = color;
+      }
+
+      // Generate random color
+      function getRandomColor() {
+        // Generate pastel colors for better aesthetics
+        const hue = Math.floor(Math.random() * 360);
+        return `hsl(${hue}, 70%, 80%)`;
+      }
+
+      // Save preferences to localStorage
+      function savePreferences() {
+        localStorage.setItem("cookbookTheme", userPreferences.theme);
+        localStorage.setItem(
+          "cookbookRecipes",
+          JSON.stringify(userPreferences.recipes)
+        );
+      }
+
+      // Show error message
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.opacity = "1";
+        errorMessage.style.transform = "translateY(0)";
+      }
+
+      // Clear error message
+      function clearError() {
+        errorMessage.textContent = "";
+        errorMessage.style.opacity = "0";
+        errorMessage.style.transform = "translateY(-10px)";
+      }
+
+      // Shake element animation
+      function shakeElement(element) {
+        element.classList.add("shake");
+        setTimeout(() => element.classList.remove("shake"), 800);
+      }
+
+      // Button ripple effect
+      function createRippleEffect(event) {
+        const button = event.currentTarget;
+
+        // Remove any existing ripple
+        const ripple = button.querySelector("span");
+        if (ripple) {
+          ripple.remove();
+        }
+
+        // Create new ripple
+        const circle = document.createElement("span");
+        const diameter = Math.max(button.clientWidth, button.clientHeight);
+        const radius = diameter / 2;
+
+        circle.style.width = circle.style.height = `${diameter}px`;
+        circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+        circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+        circle.style.position = "absolute";
+        circle.style.borderRadius = "50%";
+        circle.style.backgroundColor = "rgba(255, 255, 255, 0.7)";
+        circle.style.transform = "scale(0)";
+        circle.style.animation = "ripple 0.6s linear";
+
+        button.appendChild(circle);
+
+        // Add ripple animation style
+        if (!document.querySelector("style#ripple-style")) {
+          const style = document.createElement("style");
+          style.id = "ripple-style";
+          style.textContent = `
+            @keyframes ripple {
+              to {
+                transform: scale(4);
+                opacity: 0;
+              }
+            }
+          `;
+          document.head.appendChild(style);
+        }
+
+        // Remove the span after the animation
+        setTimeout(() => {
+          circle.remove();
+        }, 600);
+      }
+
+      // Update empty state visibility
+      function updateEmptyState() {
+        if (userPreferences.recipes.length === 0) {
+          emptyState.style.display = "block";
+        } else {
+          emptyState.style.display = "none";
+        }
+      }
+
+      // Initialize the app
+      initApp();
+    </script>
+  </body>
+</html>
